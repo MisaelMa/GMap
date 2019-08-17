@@ -2,6 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import vuetify from './plugins/vuetify';
 import router from './router';
+
 declare module "vue/types/vue" {
   interface Vue {
     $GMap: any;
@@ -22,7 +23,7 @@ Map.load();
 
 
 new Vue({
-  vuetify,
   router,
+  vuetify,
   render: (h) => h(App),
 }).$mount('#app');

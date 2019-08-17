@@ -1,7 +1,16 @@
-
+// Styles
+import './GMarker.sass';
+// Types
 import {Component, Inject, InjectReactive, Prop, Vue, Watch} from 'vue-property-decorator';
-import {CreateElement, VNode} from 'vue';
 import {GoogleMap, LatLngLiteral} from '@/interfaces/GoogleMaps';
+// Helpers
+import {CreateElement, VNode} from 'vue';
+import MarkerOptions = google.maps.MarkerOptions;
+import Events from '@/utils/events';
+//Events Maps
+import GmarkerEvents from './gmarker.events';
+import GmapEvents from '@/components/GMap/gmap.events';
+
 @Component({
     props: {
         animation: {
@@ -21,10 +30,8 @@ import {GoogleMap, LatLngLiteral} from '@/interfaces/GoogleMaps';
             type: Boolean,
             default: false
         },
-        icon: {
-        },
-        label: {
-        },
+        icon: {},
+        label: {},
         opacity: {
             type: Number,
             default: 1,
@@ -77,9 +84,9 @@ export default class GMarker extends Vue {
     })
     public draggable!: Boolean;
     @Prop()
-    public  icon!: any;
+    public icon!: any;
     @Prop()
-    public  label!: any;
+    public label!: any;
     @Prop({
         type: Number,
         default: 1,
@@ -104,7 +111,7 @@ export default class GMarker extends Vue {
 
     @Prop({
         type: String,
-        default:'GMarker'
+        default: 'GMarker'
     })
     public title!: String;
 
@@ -118,15 +125,30 @@ export default class GMarker extends Vue {
     })
     public visible!: Boolean;
 
+
     @Watch('Map')
-    public LoadMarker(){
-        const myLatlng = new google.maps.LatLng(this.position.lat,this.position.lng);
+    public LoadMarker() {
+        this.loader();
+    }
+
+    public async mounted() {
+        if (window.google && window.google.maps) {
+            // Google maps already loaded on the page.
+            this.loader();
+        } else {
+            console.log('cargando google maps')
+        }
+    }
+
+    public loader() {
+        const myLatlng = new google.maps.LatLng(this.position.lat, this.position.lng);
         const marker = new google.maps.Marker({
             position: myLatlng,
             title: this.title.toString(),
-            draggable:true,
+            draggable: true,
         });
         marker.setMap(this.Map);
+        Events(this, marker, GmarkerEvents);
     }
 
     render(h: CreateElement): VNode {

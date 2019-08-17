@@ -1,14 +1,17 @@
 // Styles
 import './GMap.sass';
 // Types
-import {Component, Prop, Provide, ProvideReactive, Vue} from 'vue-property-decorator';
+import {Component, Prop, Provide, ProvideReactive, Vue, Watch} from 'vue-property-decorator';
 import {GoogleMap, LatLngLiteral} from '@/interfaces/GoogleMaps';
 // Helpers
-import {CreateElement, VNode} from 'vue';
+import {CreateElement, VNode, VNodeChildren} from 'vue';
 import MapOptions = google.maps.MapOptions;
 import Events from '@/utils/events';
 //Events Maps
 import GmapEvents from '@/components/GMap/gmap.events';
+
+import {getSlot, defaultFilter, FilterFn, camelizeObjectKeys } from '@/utils/helpers';
+import MapTypeId = google.maps.MapTypeId;
 
 @Component({
     name: 'GMap',
@@ -37,10 +40,12 @@ import GmapEvents from '@/components/GMap/gmap.events';
         disableDoubleClickZoom: {
             type: Boolean,
             required: false,
+            default: true,
         },
         draggable:  {
             type: Boolean,
             required: false,
+            default: true,
         },
         draggableCursor: {
             type: String,
@@ -81,6 +86,7 @@ import GmapEvents from '@/components/GMap/gmap.events';
         mapTypeId: {
             // MapTypeId;
             required: false,
+            default:'roadmap',
         },
         maxZoom: {
             type: Number,
@@ -89,6 +95,10 @@ import GmapEvents from '@/components/GMap/gmap.events';
         minZoom: {
             type: Number,
             required: false,
+        },
+        options: {
+           type: Object,
+           required: false,
         },
         noClear: {
             type: Boolean,
@@ -162,11 +172,14 @@ import GmapEvents from '@/components/GMap/gmap.events';
     }
 })
 export default  class GMap extends Vue {
-    @ProvideReactive('Map') public Map: GoogleMap = <GoogleMap>{};
+    // @ProvideReactive('Map')
+    public MapObj: GoogleMap = <GoogleMap> {};
     @Prop({
+        type:Object,
         required: true,
     })
     public center!: LatLngLiteral;
+
     get style(): object {
         return {
             position: 'unset',
@@ -174,37 +187,90 @@ export default  class GMap extends Vue {
             height: '500px',
         };
     }
+
+    @Watch('center', { immediate: true, deep: true })
+    public centerWatch(newCenter: LatLngLiteral,oldCenter: LatLngLiteral): void {
+        if (typeof this.MapObj.setCenter === 'function') {
+            this.MapObj.setCenter(newCenter);
+        }
+    }
+
+    @Watch('heading')
+    public headingWatch(newHeading: number,oldHeading: number): void {
+        if (typeof this.MapObj.setHeading === 'function') {
+            this.MapObj.setHeading(newHeading);
+        }
+    }
+    @Watch('mapTypeId')
+    public mapTypeIdWatch(newmapTypeId: MapTypeId | string,oldmapTypeId: MapTypeId | string): void {
+        if (typeof this.MapObj.setMapTypeId === 'function') {
+            this.MapObj.setMapTypeId(newmapTypeId);
+        }
+    }
+    @Watch('options', { immediate: true, deep: true })
+    public optionsWatch(newOptions: any ,oldOptions: any): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions(newOptions);
+        }
+    }
+    @Watch('streetView', { immediate: true, deep: true })
+    public streetViewWatch(newStreetView: any ,oldStreetView: any): void {
+        if (typeof this.MapObj.setStreetView === 'function') {
+            this.MapObj.setStreetView(newStreetView);
+        }
+    }
+    @Watch('tilt')
+    public tiltWatch(newTilt: number,oldTilt: number): void {
+        if (typeof this.MapObj.setTilt === 'function') {
+            this.MapObj.setTilt(newTilt);
+        }
+    }
+    @Watch('zoom')
+    public zoomWatch(newZoom: number,oldZoom: number): void {
+        if (typeof this.MapObj.setZoom === 'function') {
+            this.MapObj.setZoom(newZoom);
+        }
+    }
+
     public async mounted() {
-       console.log(GmapEvents)
        await this.$GMap._scriptLoadingPromise;
-       const options: MapOptions =  { };
+       const options: MapOptions =  {
+           rotateControl: true,
+       };
        let dat: MapOptions = this.$props;
        for (const prop in dat) {
             if (this.$props[prop]!==undefined) {
                 // @ts-ignore
                 options[prop] = this.$props[prop]
-                console.log(prop+''+this.$props[prop])
+                console.log(prop)
             }
        }
         const ref: any = this.$refs;
         const element: Element = ref.gmap;
-        this.Map = await new google.maps.Map(element, options);
-        Events(this,this.Map,GmapEvents);
-        google.maps.event.addListener(this.Map, "zoom_changed", ()=> {
-          console.log(this.Map.getZoom())
-        })
+        this.MapObj = await new google.maps.Map(element, options);
+
+        Events(this,this.MapObj,GmapEvents);
     }
 
-    public clickMap(data: any){
-        console.log(data.latLng.lng())
-    }
-    render(h: CreateElement): VNode {
+
+render(h: CreateElement): VNode {
+        //this.load();
         const data = {
             staticClass: 'g-content',
             style: this.style,
             ref: 'gmap',
+
         };
-        return h('div', data, this.$slots.default);
-    };
-};
+        return h('div',
+             data,
+            [
+                getSlot(this, 'body', {map: this.MapObj},),
+                /*this.$scopedSlots.default ?
+                    this.$scopedSlots.default.length ? 'scoped' : 'normal' :
+                    this.$slots.default ? 'normal' : 'empty',
+                ' slot'*/
+            ]
+            );
+    }
+}
 

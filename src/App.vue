@@ -4,7 +4,7 @@
       <Toolbar/>
       <v-content>
         <v-container>
-          <router-view/>
+          <router-view></router-view>
         </v-container>
       </v-content>
     </v-app>
@@ -21,7 +21,7 @@
     }
   })
   export default class App extends Vue {
-    public drawer: boleant = false;
+    public drawer: Boolean = false;
   }
 </script>
 <style lang="scss">

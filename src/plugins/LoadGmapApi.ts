@@ -115,6 +115,7 @@ export default class LoadGmapApi {
         this._scriptLoadingPromise = new Promise<void>((resolve: Function, reject: Function) => {
             (<any>this._windowRef.getNativeWindow())[this.callbackName] = (data: any) => {
                  this.MapInit = true;
+                 console.log(data)
                 resolve();
             };
             /*if (!(<any>window).google || !(<any>window).google.maps) {
@@ -148,11 +149,11 @@ export default class LoadGmapApi {
             callback: callbackName,
            // client: this._config.clientId,
            // channel: this._config.channel,
-           // libraries: this._config.libraries,
+           libraries: this._config.libraries,
            // region: this._config.region,
            // language: this._config.language,
         };
-        /*const params: string = Object.keys(queryParams)
+        const params: string = Object.keys(queryParams)
             .filter((k: string) => queryParams[k] != null)
             .filter((k: string) => {
                 // remove empty arrays
@@ -170,13 +171,15 @@ export default class LoadGmapApi {
             .map((entry: {key: string, value: string}) => {
                 return `${entry.key}=${entry.value}`;
             })
-            .join('&');*/
+            .join('&');
+        /*
         let params =  Object.keys(queryParams)
                             .map((key: string) => {
                                 console.log(queryParams[key].length===0 ? 'vacio' : 'no vacio')
                                 return  queryParams[key] =='undefined' ? '' : `${key}=${queryParams[key]}`;
                             })
-                            .join('&');
+                            .join('&');*/
+        console.log(params)
         return `${protocol}//${hostAndPath}?${params}`;
     }
 }
