@@ -69,8 +69,8 @@
 </template>
 <script lang="ts">
     import {Component, Prop, Vue} from "vue-property-decorator";
-    import ApiItemProps from '@/components/Core/ApiItemProps.vue';
-    import ApiItemEvents from '@/components/Core/ApiItemEvents.vue';
+    import ApiItemProps from '@/components/Core/Docs/ApiItemProps.vue';
+    import ApiItemEvents from '@/components/Core/Docs/ApiItemEvents.vue';
 
     @Component({
         components: {

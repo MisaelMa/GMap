@@ -50,7 +50,7 @@
 <script lang="ts">
     import {Component, Vue} from "vue-property-decorator";
     import {LatLngLiteral} from "@/interfaces/GoogleMaps";
-    import ApiDoc from "@/components/Core/ApiDoc.vue";
+    import ApiDoc from "@/components/Core/Docs/ApiDoc.vue";
     import GAutocomplete from "@/components/GAutocomplete";
     import {GClusterer} from "@/components/GClusterer";
     import MapTypeId = google.maps.MapTypeId;

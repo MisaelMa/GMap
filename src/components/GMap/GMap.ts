@@ -10,15 +10,25 @@ import Events from '@/utils/events';
 //Events Maps
 import GmapEvents from '@/components/GMap/gmap.events';
 
-import {getSlot, defaultFilter, FilterFn, camelizeObjectKeys } from '@/utils/helpers';
+import {getSlot, defaultFilter, FilterFn, camelizeObjectKeys} from '@/utils/helpers';
 import MapTypeId = google.maps.MapTypeId;
+import FullscreenControlOptions = google.maps.FullscreenControlOptions;
+import GestureHandlingOptions = google.maps.GestureHandlingOptions;
+import MapTypeControlOptions = google.maps.MapTypeControlOptions;
+import PanControlOptions = google.maps.PanControlOptions;
+import MapRestriction = google.maps.MapRestriction;
+import RotateControlOptions = google.maps.RotateControlOptions;
+import ScaleControlOptions = google.maps.ScaleControlOptions;
+import StreetViewControlOptions = google.maps.StreetViewControlOptions;
+import MapTypeStyle = google.maps.MapTypeStyle;
+import ZoomControlOptions = google.maps.ZoomControlOptions;
 
 @Component({
     name: 'GMap',
     props: {
         backgroundColor: {
             type: String,
-           // default: '',
+            // default: '',
             required: false,
         },
         center: {
@@ -42,7 +52,7 @@ import MapTypeId = google.maps.MapTypeId;
             required: false,
             default: true,
         },
-        draggable:  {
+        draggable: {
             type: Boolean,
             required: false,
             default: true,
@@ -64,6 +74,7 @@ import MapTypeId = google.maps.MapTypeId;
             required: false,
         },
         gestureHandling: {
+            type: Object,
             // GestureHandlingOptions;
             required: false,
         },
@@ -80,13 +91,14 @@ import MapTypeId = google.maps.MapTypeId;
             required: false,
         },
         mapTypeControlOptions: {
+            type: Object,
             // MapTypeControlOptions;
             required: false,
         },
         mapTypeId: {
             // MapTypeId;
             required: false,
-            default:'roadmap',
+            default: 'roadmap',
         },
         maxZoom: {
             type: Number,
@@ -97,8 +109,8 @@ import MapTypeId = google.maps.MapTypeId;
             required: false,
         },
         options: {
-           type: Object,
-           required: false,
+            type: Object,
+            required: false,
         },
         noClear: {
             type: Boolean,
@@ -108,7 +120,7 @@ import MapTypeId = google.maps.MapTypeId;
             type: Boolean,
             required: false,
         },
-        panControlOptions:{
+        panControlOptions: {
             // PanControlOptions;
             required: false,
         },
@@ -158,7 +170,7 @@ import MapTypeId = google.maps.MapTypeId;
         },
         zoom: {
             type: Number,
-            default:5,
+            default: 5,
             required: false,
         },
         zoomControl: {
@@ -169,108 +181,365 @@ import MapTypeId = google.maps.MapTypeId;
             // ZoomControlOptions
             required: false,
         },
-    }
+    },
 })
-export default  class GMap extends Vue {
+export default class GMap extends Vue {
     // @ProvideReactive('Map')
     public MapObj: GoogleMap = <GoogleMap> {};
     @Prop({
-        type:Object,
+        type: Object,
         required: true,
     })
     public center!: LatLngLiteral;
 
-    get style(): object {
-        return {
-            position: 'unset',
-            overflow: 'visible',
-            height: '500px',
-        };
-    }
-
-    @Watch('center', { immediate: true, deep: true })
-    public centerWatch(newCenter: LatLngLiteral,oldCenter: LatLngLiteral): void {
+    //37 props // 36 watch just need  backgroundColor watch
+    @Watch('center', {immediate: true, deep: true})
+    public centerWatch(newCenter: LatLngLiteral, oldCenter: LatLngLiteral): void {
         if (typeof this.MapObj.setCenter === 'function') {
             this.MapObj.setCenter(newCenter);
         }
     }
 
+    @Watch('clickableIcons')
+    public clickableIconsWatch(newClickableIcons: boolean, oldClickableIcons: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                clickableIcons: newClickableIcons,
+            });
+        }
+    }
+
+    @Watch('controlSize')
+    public controlSizeWatch(newControlSize: number): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                controlSize: newControlSize,
+            });
+        }
+    }
+
+    @Watch('disableDefaultUI')
+    public disableDefaultUIWatch(newdisableDefaultUI: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                disableDefaultUI: newdisableDefaultUI,
+            });
+        }
+    }
+
+    @Watch('disableDoubleClickZoom')
+    public disableDoubleClickZoomWatch(newdisableDoubleClickZoom: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                disableDoubleClickZoom: newdisableDoubleClickZoom,
+            });
+        }
+    }
+
+    @Watch('draggable')
+    public draggableWatch(newdraggable: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                draggable: newdraggable,
+            });
+        }
+    }
+
+    @Watch('draggableCursor')
+    public draggableCursorWatch(newdraggableCursor: string): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                draggableCursor: newdraggableCursor,
+            });
+        }
+    }
+
+    @Watch('draggingCursor')
+    public draggingCursorWatch(newddraggingCursor: string): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                draggingCursor: newddraggingCursor,
+            });
+        }
+    }
+
+    @Watch('fullscreenControl')
+    public fullscreenControlWatch(newFullscreenControl: boolean, oldFullscreenControl: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                fullscreenControl: newFullscreenControl,
+            });
+        }
+    }
+
+    @Watch('fullscreenControlOptions', {immediate: true, deep: true})
+    public fullscreenControlOptionsWatch(newfullscreenControlOptions: FullscreenControlOptions): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                fullscreenControlOptions: newfullscreenControlOptions,
+            });
+        }
+    }
+
+    @Watch('gestureHandling', {immediate: true, deep: true})
+    public gestureHandlingWatch(newgestureHandling: GestureHandlingOptions): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                gestureHandling: newgestureHandling,
+            });
+        }
+    }
+
     @Watch('heading')
-    public headingWatch(newHeading: number,oldHeading: number): void {
+    public headingWatch(newHeading: number, oldHeading: number): void {
         if (typeof this.MapObj.setHeading === 'function') {
             this.MapObj.setHeading(newHeading);
         }
     }
+
+    @Watch('keyboardShortcuts')
+    public keyboardShortcutsWatch(newkeyboardShortcuts: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                keyboardShortcuts: newkeyboardShortcuts,
+            });
+        }
+    }
+
+    @Watch('mapTypeControl')
+    public mapTypeControlWatch(newmapTypeControl: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                mapTypeControl: newmapTypeControl,
+            });
+        }
+    }
+
+    @Watch('mapTypeControlOptions', {immediate: true, deep: true})
+    public mapTypeControlOptionsWatch(newmapTypeControlOptions: MapTypeControlOptions): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                mapTypeControlOptions: newmapTypeControlOptions,
+            });
+        }
+    }
+
     @Watch('mapTypeId')
-    public mapTypeIdWatch(newmapTypeId: MapTypeId | string,oldmapTypeId: MapTypeId | string): void {
+    public mapTypeIdWatch(newmapTypeId: MapTypeId | string, oldmapTypeId: MapTypeId | string): void {
         if (typeof this.MapObj.setMapTypeId === 'function') {
             this.MapObj.setMapTypeId(newmapTypeId);
         }
     }
-    @Watch('options', { immediate: true, deep: true })
-    public optionsWatch(newOptions: any ,oldOptions: any): void {
+
+    @Watch('maxZoom')
+    public maxZoomWatch(newmaxZoom: number): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                maxZoom: newmaxZoom
+            });
+        }
+    }
+
+    @Watch('minZoom')
+    public minZoomWatch(newminZoom: number): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                minZoom: newminZoom
+            });
+        }
+    }
+
+    @Watch('options', {immediate: true, deep: true})
+    public optionsWatch(newOptions: any, oldOptions: any): void {
         if (typeof this.MapObj.setOptions === 'function') {
             this.MapObj.setOptions(newOptions);
         }
     }
-    @Watch('streetView', { immediate: true, deep: true })
-    public streetViewWatch(newStreetView: any ,oldStreetView: any): void {
+
+    @Watch('noClear')
+    public noClearWatch(newnoClear: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                noClear: newnoClear,
+            });
+        }
+    }
+
+    @Watch('panControl')
+    public panControlWatch(newpanControl: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                panControl: newpanControl,
+            });
+        }
+    }
+
+    @Watch('panControlOptions', {immediate: true, deep: true})
+    public panControlOptionsWatch(newpanControlOptions: PanControlOptions): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                panControlOptions: newpanControlOptions,
+            });
+        }
+    }
+
+    @Watch('restriction', {immediate: true, deep: true})
+    public restrictionWatch(newrestriction: MapRestriction): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                restriction: newrestriction,
+            });
+        }
+    }
+
+    @Watch('rotateControl')
+    public rotateControlWatch(newrotateControl: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                rotateControl: newrotateControl,
+            });
+        }
+    }
+
+    @Watch('rotateControlOptions', {immediate: true, deep: true})
+    public rotateControlOptionsWatch(newrotateControlOptions: RotateControlOptions): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                rotateControlOptions: newrotateControlOptions,
+            });
+        }
+    }
+
+    @Watch('scaleControl')
+    public scaleControlWatch(newscaleControl: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                scaleControl: newscaleControl,
+            });
+        }
+    }
+
+    @Watch('scaleControlOptions', {immediate: true, deep: true})
+    public scaleControlOptionsWatch(newscaleControlOptions: ScaleControlOptions): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                scaleControlOptions: newscaleControlOptions
+            });
+        }
+    }
+
+    @Watch('scrollwheel')
+    public scrollwheelWatch(newscrollwheel: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                scrollwheel: newscrollwheel,
+            });
+        }
+    }
+
+    @Watch('streetView', {immediate: true, deep: true})
+    public streetViewWatch(newStreetView: any, oldStreetView: any): void {
         if (typeof this.MapObj.setStreetView === 'function') {
             this.MapObj.setStreetView(newStreetView);
         }
     }
+
+    @Watch('streetViewControl')
+    public streetViewControlWatch(newstreetViewControl: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                streetViewControl: newstreetViewControl,
+            });
+        }
+    }
+
+    @Watch('streetViewControlOptions', {immediate: true, deep: true})
+    public streetViewControlOptionsWatch(newstreetViewControlOptions: StreetViewControlOptions): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                streetViewControlOptions: newstreetViewControlOptions
+            });
+        }
+    }
+
+    @Watch('styles', {immediate: true, deep: true})
+    public stylesWatch(newstyles: MapTypeStyle[]): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                styles: newstyles,
+            });
+        }
+    }
+
     @Watch('tilt')
-    public tiltWatch(newTilt: number,oldTilt: number): void {
+    public tiltWatch(newTilt: number, oldTilt: number): void {
         if (typeof this.MapObj.setTilt === 'function') {
             this.MapObj.setTilt(newTilt);
         }
     }
+
     @Watch('zoom')
-    public zoomWatch(newZoom: number,oldZoom: number): void {
+    public zoomWatch(newZoom: number, oldZoom: number): void {
         if (typeof this.MapObj.setZoom === 'function') {
             this.MapObj.setZoom(newZoom);
         }
     }
 
+    @Watch('zoomControl')
+    public zoomControlWatch(newZoom: boolean, oldZoom: boolean): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            this.MapObj.setOptions({
+                zoomControl: newZoom,
+            });
+        }
+    }
+
+    @Watch('zoomControlOptions', {immediate: true, deep: true})
+    public zoomControlOptionsWatch(newzoomControlOptions: ZoomControlOptions): void {
+        if (typeof this.MapObj.setOptions === 'function') {
+            console.log(newzoomControlOptions);
+            this.MapObj.setOptions({
+                zoomControlOptions: newzoomControlOptions,
+            });
+        }
+    }
+
     public async mounted() {
-       await this.$GMap._scriptLoadingPromise;
-       const options: MapOptions =  {
-           rotateControl: true,
-       };
-       let dat: MapOptions = this.$props;
-       for (const prop in dat) {
-            if (this.$props[prop]!==undefined) {
+        await this.$GMap._scriptLoadingPromise;
+        const options: MapOptions = {
+            rotateControl: true,
+        };
+        const dat: MapOptions = this.$props;
+        for (const prop in dat) {
+            if (this.$props[prop] !== undefined) {
                 // @ts-ignore
-                options[prop] = this.$props[prop]
-                console.log(prop)
+                options[prop] = this.$props[prop];
+                // console.log(prop)
             }
-       }
+        }
         const ref: any = this.$refs;
         const element: Element = ref.gmap;
         this.MapObj = await new google.maps.Map(element, options);
-
-        Events(this,this.MapObj,GmapEvents);
+        Events(this, this.MapObj, GmapEvents);
     }
 
 
-render(h: CreateElement): VNode {
-        //this.load();
+    public render(h: CreateElement): VNode {
+        // this.load();
         const data = {
             staticClass: 'g-content',
-            style: this.style,
             ref: 'gmap',
-
         };
         return h('div',
-             data,
+            data,
             [
-                getSlot(this, 'body', {map: this.MapObj},),
+                getSlot(this, 'body', {map: this.MapObj}),
                 /*this.$scopedSlots.default ?
                     this.$scopedSlots.default.length ? 'scoped' : 'normal' :
                     this.$slots.default ? 'normal' : 'empty',
                 ' slot'*/
-            ]
-            );
+            ],
+        );
     }
 }
 
