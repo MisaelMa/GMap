@@ -5,24 +5,64 @@
             <v-col cols="12">
                 <ApiMarker/>
             </v-col>-->
-            <v-col cols="12" >
-                <v-sheet   style="height: 500px;">
+            <v-col cols="12">
+                <v-toolbar
+                        dense
+                        floating
+                >
+                    <v-text-field
+                            v-model="image"
+                            hide-details
+                            prepend-icon="search"
+                            single-line
+                    ></v-text-field>
+
+                    <v-btn icon>
+                        <v-icon>my_location</v-icon>
+                    </v-btn>
+
+                    <v-btn icon>
+                        <v-icon>more_vert</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-sheet style="height: 500px;">
 
                     <GMap :center="center"
                           zoom-control
                           street-view-control
                           map-type-control
+                          scrollwheel
                           fullscreen-control
-                          @click="amir"
                     >
                         <template v-slot:map="{map}">
-                            <g-marker  v-for="position of positions"
-                                       :position="position.position"
-                                       :title="position.title"
-                                       :map="map"
-                                       :icon="position.icon ? position.icon : icon "
-                                       draggable
-                                       @drag="amir"
+                            <v-toolbar
+                                    dense
+                                    floating
+                            >
+                                <v-text-field
+                                        hide-details
+                                        prepend-icon="search"
+                                        single-line
+                                ></v-text-field>
+
+                                <v-btn icon>
+                                    <v-icon>my_location</v-icon>
+                                </v-btn>
+
+                                <v-btn icon>
+                                    <v-icon>more_vert</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                            <g-marker v-for="position of positions"
+                                      :position="position.position"
+                                      :title="position.title"
+                                      :label="position.title.toString().charAt(1)"
+                                      :map="map"
+                                      :icon="image"
+                                      :animation="position.animation?position.animation:animation"
+                                      draggable
+                                      @drag="amir"
+                                      @click="amir"
 
                             />
                         </template>
@@ -37,17 +77,20 @@
 <script lang="ts">
     import {Component, Prop, Vue} from "vue-property-decorator";
     import LatLngLiteral = google.maps.LatLngLiteral;
+
     const GMarker = import("@/components/GMarker/GMarker");
     @Component({
-        components:{
+        components: {
             ApiMarker: async () => await import("@/components/Core/Markers/ApiMarker.vue"),
             GMap: () => import("@/components/GMap/GMap"),
-            GMarker: () =>  import("@/components/GMarker/GMarker"),
+            GMarker: () => import("@/components/GMarker/GMarker"),
 
         }
     })
     export default class MarkerView extends Vue {
         public center: LatLngLiteral = {lat: 19.4284706, lng: -99.1276627};
+        public image = "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+        public animation = google.maps.Animation.BOUNCE;
         public positions: any = [
             {
                 title: "Ciudad de México",
@@ -69,12 +112,12 @@
                     lat: 19.6049194,
                     lng: -99.0606384
                 },
-                icon:{
+                icon: {
                     size: {
                         height: 50,
                         width: 50,
                     },
-                    url: 'https://www.phoca.cz/images/projects/phoca-maps-r.svg',
+                    url: "https://www.phoca.cz/images/projects/phoca-maps-r.svg",
                 }
             },
             {
@@ -125,6 +168,7 @@
                     lat: 25.6750698,
                     lng: -100.3184662
                 },
+                animation: google.maps.Animation.DROP,
             },
             {
                 title: "León",
@@ -172,26 +216,31 @@
 
         public icon = {
             scaledSize: {
-                height: 100,
-                width: 100,
+                height: 50,
+                width: 50,
             },
             size: {
                 height: 100,
                 width: 100,
             },
-            url: 'https://colorlib.com/wp/wp-content/uploads/sites/2/google-maps-wordpress-plugins.png',
+            url: "https://colorlib.com/wp/wp-content/uploads/sites/2/google-maps-wordpress-plugins.png",
+        };
+
+        amir(amir: any) {
+            console.log(amir.latLng.lat());
+            amir.latLng.lng();
+            this.positions.push({
+                title: "amir",
+                position: {
+                    lat: amir.latLng.lat(),
+                    lng: amir.latLng.lng(),
+                },
+            });
         }
-     amir(amir:any){
-         console.log(amir.latLng.lat())
-                     amir.latLng.lng()
-         this.positions.push({
-             title: "amir",
-             position: {
-                 lat: amir.latLng.lat(),
-                 lng: amir.latLng.lng(),
-             },
-         })
-     }
+
+        public mounted() {
+            // console.log(require('/assets/drawing.svg'))
+        }
     }
 </script>
 

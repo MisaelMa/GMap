@@ -1,6 +1,7 @@
 import '@types/googlemaps';
 export interface GoogleMap extends  google.maps.Map {
-
+}
+export interface GoogleMarker extends google.maps.Marker {
 }
 
 export interface LatLngLiteral {

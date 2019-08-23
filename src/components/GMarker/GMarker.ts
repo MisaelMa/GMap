@@ -2,7 +2,7 @@
 import './GMarker.sass';
 // Types
 import {Component, Inject, InjectReactive, Prop, Vue, Watch} from 'vue-property-decorator';
-import {GoogleMap, LatLngLiteral} from '@/interfaces/GoogleMaps';
+import {GoogleMap, GoogleMarker, LatLngLiteral} from '@/interfaces/GoogleMaps';
 // Helpers
 import {CreateElement, VNode} from 'vue';
 import MarkerOptions = google.maps.MarkerOptions;
@@ -12,18 +12,18 @@ import GmarkerEvents from './gmarker.events';
 import Point = google.maps.Point;
 import StreetViewPanorama = google.maps.StreetViewPanorama;
 import ReadonlyMarkerOptions = google.maps.ReadonlyMarkerOptions;
+import Place = google.maps.Place;
+import MarkerShape = google.maps.MarkerShape;
+
 @Component({
     props: {
         animation: {
             type: Number,
-            required:true,
-        },
-        attribution: {
-            type: Object
+            required: true,
         },
         clickable: {
             type: Boolean,
-            default: true
+            default: true,
         },
         cursor: {
             type: String,
@@ -62,12 +62,9 @@ import ReadonlyMarkerOptions = google.maps.ReadonlyMarkerOptions;
     }
 })
 export default class GMarker extends Vue {
-    @InjectReactive('Map')
-   /* @Prop({
-        type: Object,
-    })*/
-    public Map!: GoogleMap;
-
+    /*@InjectReactive('Map')
+    public Map!: GoogleMap;*/
+    public marker: GoogleMarker = <GoogleMarker> {};
     @Prop({
         type: Object,
     })
@@ -77,14 +74,10 @@ export default class GMarker extends Vue {
     })
     public animation!: Number;
     @Prop({
-        type: Object,
-    })
-    public attribution!: Object;
-    @Prop({
         type: Boolean,
-        default: true,
     })
     public clickable!: Boolean;
+
     @Prop({
         type: String,
     })
@@ -105,9 +98,9 @@ export default class GMarker extends Vue {
     public opacity!: Number;
 
     @Prop({
-        type: Object ,
+        type: Object,
     })
-    public map!: GoogleMap|StreetViewPanorama;
+    public map!: GoogleMap | StreetViewPanorama;
 
     @Prop({
         type: Object
@@ -142,33 +135,143 @@ export default class GMarker extends Vue {
     })
     public zIndex!: Number;
 
+    /*=============================================*/
+    @Watch('anchorPoint', {immediate: true, deep: true})
+    public async anchorPointWatch(newanchorPoint: Point) {
+        if (typeof this.marker.setOptions === 'function') {
+            this.marker.setOptions({
+                anchorPoint: newanchorPoint,
+            });
+        }
+    }
 
-    @Watch('Map')
-    public async LoadMarker() {
+    @Watch('animation')
+    public async animationWatch(newanimation: number) {
+        if (typeof this.marker.setAnimation === 'function') {
+            this.marker.setAnimation(newanimation);
+        }
+    }
+
+    @Watch('clickable')
+    public async clickableWatch(newclickable: boolean) {
+        if (typeof this.marker.setClickable === 'function') {
+            this.marker.setClickable(newclickable);
+        }
+    }
+
+    @Watch('cursor')
+    public async cursorWatch(newcursor: string) {
+        if (typeof this.marker.setCursor === 'function') {
+            this.marker.setCursor(newcursor);
+        }
+    }
+
+    @Watch('draggable')
+    public async draggableWatch(newdraggable: boolean) {
+        if (typeof this.marker.setDraggable === 'function') {
+            this.marker.setDraggable(newdraggable);
+        }
+    }
+
+    @Watch('icon', {immediate: true, deep: true})
+    public async iconWatch(newicon: any) {
+        if (typeof this.marker.setIcon === 'function') {
+            this.marker.setIcon(newicon);
+        }
+    }
+
+    @Watch('label', {immediate: true, deep: true})
+    public async labelWatch(newlabel: any) {
+        if (typeof this.marker.setLabel === 'function') {
+            this.marker.setLabel(newlabel);
+        }
+    }
+
+    @Watch('opacity')
+    public async opacityWatch(newopacity: number) {
+        if (typeof this.marker.setOpacity === 'function') {
+            this.marker.setOpacity(newopacity);
+        }
+    }
+
+    @Watch('map')
+    public async LoadMarker(newMap: GoogleMap | StreetViewPanorama) {
         if (window.google && window.google.maps) {
             // Google maps already loaded on the page.
             await this.loader();
         } else {
-            console.log('cargando google maps')
+            console.log('cargando google maps');
+        }
+    }
+
+    @Watch('options', {immediate: true, deep: true})
+    public async optionsWatch(newOption: ReadonlyMarkerOptions) {
+        if (typeof this.marker.setOptions === 'function') {
+            this.marker.setOptions(newOption);
+        }
+    }
+
+    @Watch('place', {immediate: true, deep: true})
+    public async placeWatch(newplace: Place) {
+        if (typeof this.marker.setOptions === 'function') {
+            this.marker.setOptions({
+                place: newplace
+            });
+        }
+    }
+
+    @Watch('position', {immediate: true, deep: true})
+    public async positionWatch(newposition: LatLngLiteral) {
+        if (typeof this.marker.setPosition === 'function') {
+            this.marker.setPosition(newposition);
+        }
+    }
+
+    @Watch('shape', {immediate: true, deep: true})
+    public async shapeWatch(newshape: MarkerShape | null) {
+        if (typeof this.marker.setShape === 'function') {
+            this.marker.setShape(newshape);
+        }
+    }
+
+    @Watch('title')
+    public async titleWatch(newtitle: string) {
+        if (typeof this.marker.setTitle === 'function') {
+            this.marker.setTitle(newtitle);
+        }
+    }
+
+    @Watch('visible')
+    public async visibleWatch(newvisible: boolean) {
+        if (typeof this.marker.setVisible === 'function') {
+            this.marker.setVisible(newvisible);
+        }
+    }
+
+    @Watch('zIndex')
+    public async zIndexWatch(newzIndex: number) {
+        if (typeof this.marker.setZIndex === 'function') {
+            this.marker.setZIndex(newzIndex);
         }
     }
 
     public async mounted() {
         if (window.google && window.google.maps) {
             // Google maps already loaded on the page.
-           await this.loader();
+            await this.loader();
         } else {
-            console.log('cargando google maps')
+            console.log('cargando google maps');
         }
     }
 
     public async loader() {
-            if (Object.keys(this.map).length !== 0 ) {
-                const options: ReadonlyMarkerOptions = await this.$props;
-                const marker = await new google.maps.Marker(options);
-                Events(this, marker, GmarkerEvents);
-            }
+        if (Object.keys(this.map).length !== 0) {
+            const options: ReadonlyMarkerOptions = await this.$props;
+            this.marker = await new google.maps.Marker(options);
+            Events(this, this.marker, GmarkerEvents);
+        }
     }
+
     render(h: CreateElement): VNode {
         const data = {
             staticClass: 'g-marker',
