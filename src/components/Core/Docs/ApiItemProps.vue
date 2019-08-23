@@ -11,7 +11,7 @@
                 </v-col>
                 <v-col cols="6" md="2" class="text-xs-right">
                     <div class="text-capitalize overline grey--text text--darken-3">type</div>
-                    <span class="mono">{{prop.type}}</span><!----></v-col>
+                    <span class="mono" v-html="prop.type"></span><!----></v-col>
                 <v-col    md="7"  class="text-md-right">
                     <div class="text-capitalize overline grey--text text--darken-3">default</div><!---->
                     <span class="mono">{{prop.default}}</span>

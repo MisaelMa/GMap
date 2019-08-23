@@ -1,83 +1,53 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
-    <div class="home">
+    <v-container fluid>
+        <v-row>
+            <!--
+            <v-col cols="12">
+                <ApiMarker/>
+            </v-col>-->
+            <v-col cols="12" >
+                <v-sheet   style="height: 500px;">
 
-        {{positions.length}}-->
-        {{zoom}}
-        {{center}}
-        {{MapTypeIda}}
-        <v-btn @click="zoom++">
-            <v-icon>zoom_in</v-icon>
-        </v-btn>
-        <v-btn @click="zoom--">
-            <v-icon>zoom_out</v-icon>
-        </v-btn>
-        -
-        <GAutocomplete id="a"></GAutocomplete>
-        <v-select
-                v-model="MapTypeIda"
-                :items="MapsTypeIds"
-                label="Standard"
-        ></v-select>
-        <GMap
-                :center="center"
-                :heading="100"
-                :zoom="zoom"
-                :zoom-control="true"
-                :tilt="45"
-                :disable-double-click-zoom="true"
-                draggable
-                disableDefaultUI
-                rotateControl
-                mapTypeControl
-                fullscreenControl
-                scrollwheel
-                clickableIcons
-                :mapTypeId="MapTypeIda"
-                :street-view-control="true"
-                :panControl="true"
-                @drag="clickFuntion"
-                class="amir"
+                    <GMap :center="center"
+                          zoom-control
+                          street-view-control
+                          map-type-control
+                          fullscreen-control
+                          @click="amir"
+                    >
+                        <template v-slot:map="{map}">
+                            <g-marker  v-for="position of positions"
+                                       :position="position.position"
+                                       :title="position.title"
+                                       :map="map"
+                                       :icon="position.icon ? position.icon : icon "
+                                       draggable
+                                       @drag="amir"
 
-        >
-            <template v-slot:map="{map}">
-                <GInfoWindow :Map="map"></GInfoWindow>
-            </template>
+                            />
+                        </template>
 
-        </GMap>
-    </div>
+                    </GMap>
+                </v-sheet>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from "vue-property-decorator";
-    import {LatLngLiteral} from "@/interfaces/GoogleMaps";
-    import ApiDoc from "@/components/Core/Docs/ApiDoc.vue";
-    import GAutocomplete from "@/components/GAutocomplete";
-    import {GClusterer} from "@/components/GClusterer";
-    import MapTypeId = google.maps.MapTypeId;
-
+    import {Component, Prop, Vue} from "vue-property-decorator";
+    import LatLngLiteral = google.maps.LatLngLiteral;
+    const GMarker = import("@/components/GMarker/GMarker");
     @Component({
-        components: {
-            ApiDoc,
+        components:{
+            ApiMarker: async () => await import("@/components/Core/Markers/ApiMarker.vue"),
             GMap: () => import("@/components/GMap/GMap"),
-            GInfoWindow: () => import("@/components/GInfoWindow/GInfoWindow"),
-            GMarker: () => import("@/components/GMarker/GMarker"),
-            GAutocomplete,
-            GClusterer,
-        },
+            GMarker: () =>  import("@/components/GMarker/GMarker"),
+
+        }
     })
-    export default class Home extends Vue {
-
-
-
-        public zoom: number = 5;
-        public center: LatLngLiteral = {lat: 45.518, lng: -122.672};
-        public MapTypeIda: any = "satellite";
-        public MapsTypeIds: any = [
-            "hybrid",
-            "roadmap",
-            "satellite",
-            "terrain",
-        ];
+    export default class MarkerView extends Vue {
+        public center: LatLngLiteral = {lat: 19.4284706, lng: -99.1276627};
         public positions: any = [
             {
                 title: "Ciudad de México",
@@ -99,6 +69,13 @@
                     lat: 19.6049194,
                     lng: -99.0606384
                 },
+                icon:{
+                    size: {
+                        height: 50,
+                        width: 50,
+                    },
+                    url: 'https://www.phoca.cz/images/projects/phoca-maps-r.svg',
+                }
             },
             {
                 title: "Guadalajara",
@@ -193,23 +170,31 @@
             },
         ];
 
-
-        public clickFuntion(data: any) {
-            console.log(data)
-            /*let obj = {
-                title: "amir",
-                position: {
-                    lat: data.latLng.lat(),
-                    lng: data.latLng.lng(),
-                }
-            };
-            console.log(obj.position);
-            this.center = {
-                lat: data.latLng.lat(),
-                lng: data.latLng.lng(),
-            };*/
-            //this.positions.push(obj);
+        public icon = {
+            scaledSize: {
+                height: 100,
+                width: 100,
+            },
+            size: {
+                height: 100,
+                width: 100,
+            },
+            url: 'https://colorlib.com/wp/wp-content/uploads/sites/2/google-maps-wordpress-plugins.png',
         }
-
+     amir(amir:any){
+         console.log(amir.latLng.lat())
+                     amir.latLng.lng()
+         this.positions.push({
+             title: "amir",
+             position: {
+                 lat: amir.latLng.lat(),
+                 lng: amir.latLng.lng(),
+             },
+         })
+     }
     }
 </script>
+
+<style scoped>
+
+</style>

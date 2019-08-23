@@ -113,10 +113,11 @@ export default class LoadGmapApi {
 
     private async _assignScriptLoadingPromise(scriptElem: HTMLScriptElement) {
         this._scriptLoadingPromise = new Promise<void>((resolve: Function, reject: Function) => {
+
             (<any>this._windowRef.getNativeWindow())[this.callbackName] = (data: any) => {
-                 this.MapInit = true;
-                 console.log(data)
-                resolve();
+                  this.MapInit = true;
+                  console.log('Mapa Cargado');
+                  resolve();
             };
             /*if (!(<any>window).google || !(<any>window).google.maps) {
                 throw new Error(

@@ -184,8 +184,9 @@ import ZoomControlOptions = google.maps.ZoomControlOptions;
     },
 })
 export default class GMap extends Vue {
-    // @ProvideReactive('Map')
+    @ProvideReactive('Map')
     public MapObj: GoogleMap = <GoogleMap> {};
+
     @Prop({
         type: Object,
         required: true,
@@ -506,9 +507,7 @@ export default class GMap extends Vue {
 
     public async mounted() {
         await this.$GMap._scriptLoadingPromise;
-        const options: MapOptions = {
-            rotateControl: true,
-        };
+        const options: MapOptions = {};
         const dat: MapOptions = this.$props;
         for (const prop in dat) {
             if (this.$props[prop] !== undefined) {
@@ -520,7 +519,7 @@ export default class GMap extends Vue {
         const ref: any = this.$refs;
         const element: Element = ref.gmap;
         this.MapObj = await new google.maps.Map(element, options);
-        Events(this, this.MapObj, GmapEvents);
+        await Events(this, this.MapObj, GmapEvents);
     }
 
 
@@ -530,10 +529,10 @@ export default class GMap extends Vue {
             staticClass: 'g-content',
             ref: 'gmap',
         };
-        return h('div',
+       return  h('div',
             data,
             [
-                getSlot(this, 'body', {map: this.MapObj}),
+                getSlot(this, 'map', {map: this.MapObj}),
                 /*this.$scopedSlots.default ?
                     this.$scopedSlots.default.length ? 'scoped' : 'normal' :
                     this.$slots.default ? 'normal' : 'empty',

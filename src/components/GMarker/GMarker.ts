@@ -9,12 +9,14 @@ import MarkerOptions = google.maps.MarkerOptions;
 import Events from '@/utils/events';
 //Events Maps
 import GmarkerEvents from './gmarker.events';
-import GmapEvents from '@/components/GMap/gmap.events';
-
+import Point = google.maps.Point;
+import StreetViewPanorama = google.maps.StreetViewPanorama;
+import ReadonlyMarkerOptions = google.maps.ReadonlyMarkerOptions;
 @Component({
     props: {
         animation: {
-            type: Number
+            type: Number,
+            required:true,
         },
         attribution: {
             type: Object
@@ -60,7 +62,16 @@ import GmapEvents from '@/components/GMap/gmap.events';
     }
 })
 export default class GMarker extends Vue {
-    @InjectReactive('Map') Map!: GoogleMap;
+    @InjectReactive('Map')
+   /* @Prop({
+        type: Object,
+    })*/
+    public Map!: GoogleMap;
+
+    @Prop({
+        type: Object,
+    })
+    public anchorPoint!: Point;
     @Prop({
         type: Number,
     })
@@ -92,6 +103,12 @@ export default class GMarker extends Vue {
         default: 1,
     })
     public opacity!: Number;
+
+    @Prop({
+        type: Object ,
+    })
+    public map!: GoogleMap|StreetViewPanorama;
+
     @Prop({
         type: Object
     })
@@ -116,41 +133,42 @@ export default class GMarker extends Vue {
     public title!: String;
 
     @Prop({
-        type: Number,
-    })
-    public zIndex!: Number;
-    @Prop({
         type: Boolean,
         default: true,
     })
     public visible!: Boolean;
+    @Prop({
+        type: Number,
+    })
+    public zIndex!: Number;
 
 
     @Watch('Map')
-    public LoadMarker() {
-        this.loader();
-    }
-
-    public async mounted() {
+    public async LoadMarker() {
         if (window.google && window.google.maps) {
             // Google maps already loaded on the page.
-            this.loader();
+            await this.loader();
         } else {
             console.log('cargando google maps')
         }
     }
 
-    public loader() {
-        const myLatlng = new google.maps.LatLng(this.position.lat, this.position.lng);
-        const marker = new google.maps.Marker({
-            position: myLatlng,
-            title: this.title.toString(),
-            draggable: true,
-        });
-        marker.setMap(this.Map);
-        Events(this, marker, GmarkerEvents);
+    public async mounted() {
+        if (window.google && window.google.maps) {
+            // Google maps already loaded on the page.
+           await this.loader();
+        } else {
+            console.log('cargando google maps')
+        }
     }
 
+    public async loader() {
+            if (Object.keys(this.map).length !== 0 ) {
+                const options: ReadonlyMarkerOptions = await this.$props;
+                const marker = await new google.maps.Marker(options);
+                Events(this, marker, GmarkerEvents);
+            }
+    }
     render(h: CreateElement): VNode {
         const data = {
             staticClass: 'g-marker',
