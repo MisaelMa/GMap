@@ -1,5 +1,5 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
-    <div class="home">
+    <div class="home" >
 
         {{positions.length}}-->
         {{zoom}}
@@ -37,10 +37,11 @@
                 :panControl="true"
                 @drag="clickFuntion"
                 class="amir"
+                style="height: 500px"
 
         >
             <template v-slot:map="{map}">
-                <GInfoWindow :Map="map"></GInfoWindow>
+                <GInfoWindow :map="map"></GInfoWindow>
             </template>
 
         </GMap>

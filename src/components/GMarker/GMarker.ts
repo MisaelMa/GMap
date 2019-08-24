@@ -275,7 +275,7 @@ export default class GMarker extends Vue {
     render(h: CreateElement): VNode {
         const data = {
             staticClass: 'g-marker',
-            ref: 'marker',
+            ref: 'g-marker',
         };
         return h('div', data);
     };
