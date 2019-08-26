@@ -3,6 +3,8 @@
         <v-row>
             <v-col cols="12">
                 <v-btn @click="count++">{{count}}</v-btn>
+                <v-switch v-model="stateIW" :label="`Switch 1: ${stateIW.toString()}`"></v-switch>
+
                 <v-sheet style="height: 500px;">
 
                     <GMap :center="center"
@@ -11,6 +13,7 @@
                           map-type-control
                           scrollwheel
                           fullscreen-control
+                          @click="amir"
                     >
                         <template v-slot:map="{map}">
                             <g-marker v-for="position of positions"
@@ -19,55 +22,86 @@
                                       :label="position.title.toString().charAt(1)"
                                       :map="map"
                                       :icon="image"
-                                      :animation="position.animation?position.animation:animation"
                                       draggable
                                       @drag="amir"
-                                      @click="amir"
+
 
                             />
-                            <GInfoWindow :map="map">
+                            <GInfoWindow v-model="stateIW"
+                                         :map="map"
+                                         :position="center"
+                                         @closeclick="close()"
+                            >
                                 <template v-slot:body>
-                                    <v-card
-                                            class="mx-auto elevation-20"
-                                            color="purple"
-                                            dark
-                                            style="max-width: 410px;"
-                                    >
-                                        <v-row justify="space-between">
-                                            <v-col cols="8">
-                                                <v-card-title primary-title>
-                                                    <div>
-                                                        <div class="headline">Halycon Days</div>
-                                                        <div>Ellie Goulding</div>
-                                                        <div>(2013)</div>
-                                                    </div>
-                                                </v-card-title>
-                                            </v-col>
-                                            <v-img
-                                                    class="shrink ma-"
-                                                    contain
-                                                    height="125px"
-                                                    src="https://cdn.vuetifyjs.com/images/cards/halcyon.png"
-                                                    style="flex-basis: 125px"
-                                            ></v-img>
-                                        </v-row>
-                                        <v-divider dark></v-divider>
-                                        <v-card-actions class="pa-4">
-                                            Rate this album
+                                    <v-card>
+                                        <v-toolbar color="light-blue" light extended>
+                                            <v-app-bar-nav-icon></v-app-bar-nav-icon>
+                                            <v-toolbar-title class="white--text">My files</v-toolbar-title>
                                             <div class="flex-grow-1"></div>
-                                            <span class="grey--text text--lighten-2 caption mr-2">
-        ({{ rating }})
-      </span>
-                                            <v-rating
-                                                    v-model="rating"
-                                                    background-color="white"
-                                                    color="yellow accent-4"
-                                                    dense
-                                                    half-increments
-                                                    hover
-                                                    size="18"
-                                            ></v-rating>
-                                        </v-card-actions>
+                                            <v-btn icon>
+                                                <v-icon>search</v-icon>
+                                            </v-btn>
+                                            <v-btn icon>
+                                                <v-icon>view_module</v-icon>
+                                            </v-btn>
+                                            <template v-slot:extension>
+                                                <v-btn
+                                                        fab
+                                                        color="cyan accent-2"
+                                                        bottom
+                                                        left
+                                                        absolute
+                                                        @click="dialog = !dialog"
+                                                >
+                                                    <v-icon>add</v-icon>
+                                                </v-btn>
+                                            </template>
+                                        </v-toolbar>
+                                        <v-list two-line subheader>
+                                            <v-subheader inset>Folders</v-subheader>
+                                            <v-list-item v-for="item in items" :key="item.title" @click="">
+                                                <v-list-item-avatar>
+                                                    <v-icon :class="[item.iconClass]">{{ item.icon }}</v-icon>
+                                                </v-list-item-avatar>
+                                                <v-list-item-content>
+                                                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                                    <v-list-item-subtitle>{{ item.subtitle }}</v-list-item-subtitle>
+                                                </v-list-item-content>
+                                                <v-list-item-action>
+                                                    <v-btn icon>
+                                                        <v-icon color="grey lighten-1">info</v-icon>
+                                                    </v-btn>
+                                                </v-list-item-action>
+                                            </v-list-item>
+                                            <v-divider inset></v-divider>
+                                            <v-subheader inset>Files</v-subheader>
+                                            <v-list-item v-for="item in items2" :key="item.title" @click="">
+                                                <v-list-item-avatar>
+                                                    <v-icon :class="[item.iconClass]">{{ item.icon }}</v-icon>
+                                                </v-list-item-avatar>
+                                                <v-list-item-content>
+                                                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                                    <v-list-item-subtitle>{{ item.subtitle }}</v-list-item-subtitle>
+                                                </v-list-item-content>
+                                                <v-list-item-action>
+                                                    <v-btn icon ripple>
+                                                        <v-icon color="grey lighten-1">info</v-icon>
+                                                    </v-btn>
+                                                </v-list-item-action>
+                                            </v-list-item>
+                                        </v-list>
+                                        <v-dialog v-model="dialog" max-width="500px">
+                                            <v-card>
+                                                <v-card-text>
+                                                    <v-text-field label="File name"></v-text-field>
+                                                    <small class="grey--text">* This doesn't actually save.</small>
+                                                </v-card-text>
+                                                <v-card-actions>
+                                                    <div class="flex-grow-1"></div>
+                                                    <v-btn text color="primary" @click="dialog = false">Submit</v-btn>
+                                                </v-card-actions>
+                                            </v-card>
+                                        </v-dialog>
                                     </v-card>
                                 </template>
                             </GInfoWindow>
@@ -96,9 +130,25 @@
     export default class InfoWindowView extends Vue {
         public center: LatLngLiteral = {lat: 19.4284706, lng: -99.1276627};
         public image = "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
-        public animation = google.maps.Animation.BOUNCE;
+        // public animation = google.maps.Animation.BOUNCE;
         public count = 1;
         rating = 4.3;
+        public stateIW: boolean = false;
+        dialog: boolean = false;
+        items: any = [
+            {icon: "folder", iconClass: "grey lighten-1 white--text", title: "Photos", subtitle: "Jan 9, 2014"},
+            {icon: "folder", iconClass: "grey lighten-1 white--text", title: "Recipes", subtitle: "Jan 17, 2014"},
+            {icon: "folder", iconClass: "grey lighten-1 white--text", title: "Work", subtitle: "Jan 28, 2014"},
+        ];
+        items2: any = [
+            {icon: "assignment", iconClass: "blue white--text", title: "Vacation itinerary", subtitle: "Jan 20, 2014"},
+            {
+                icon: "call_to_action",
+                iconClass: "amber white--text",
+                title: "Kitchen remodel",
+                subtitle: "Jan 10, 2014"
+            },
+        ];
 
         public positions: any = [
             {
@@ -116,13 +166,13 @@
                 }
             },
         ];
-       public colors: string[] = [
-            'primary',
-            'secondary',
-            'yellow darken-2',
-            'red',
-            'orange',
-            ]
+        public colors: string[] = [
+            "primary",
+            "secondary",
+            "yellow darken-2",
+            "red",
+            "orange",
+        ];
         public icon = {
             scaledSize: {
                 height: 50,
@@ -136,28 +186,38 @@
         };
 
         amir(amir: any) {
-            console.log(amir.latLng.lat());
-            amir.latLng.lng();
+            //console.log(amir.latLng.lat());
+            /*amir.latLng.lng();
             this.positions.push({
                 title: "amir",
                 position: {
                     lat: amir.latLng.lat(),
                     lng: amir.latLng.lng(),
                 },
-            });
+            });*/
+            this.center =  {
+                lat: amir.latLng.lat(),
+                lng: amir.latLng.lng(),
+            };
+            this.stateIW = true;
         }
 
-        public mounted() {
+        public close() {
+            console.log('cerradp')
             // console.log(require('/assets/drawing.svg'))
         }
     }
 </script>
 
-<style lang="sass">
-    .gm-style
-        .gm-style-iw
-            .gm-style-iw-d
-                height: 204px
-                width: 412px
+<style lang="scss">
+    /*
+       .gm-style{
+           .gm-style-iw{
+               .gm-style-iw-d{
+                    height: 204px;
+                    width: 412px;
+               }
 
+           }
+       }*/
 </style>
