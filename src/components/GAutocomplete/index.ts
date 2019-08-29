@@ -1,4 +1,4 @@
-import GAutocomplete from './GAutocomplete';
+import GAutocomplete from './GAutocomplete.vue';
 
 export { GAutocomplete };
 

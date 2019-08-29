@@ -22,6 +22,7 @@ import ScaleControlOptions = google.maps.ScaleControlOptions;
 import StreetViewControlOptions = google.maps.StreetViewControlOptions;
 import MapTypeStyle = google.maps.MapTypeStyle;
 import ZoomControlOptions = google.maps.ZoomControlOptions;
+import ControlPosition = google.maps.ControlPosition;
 
 @Component({
     name: 'GMap',
@@ -516,13 +517,30 @@ export default class GMap extends Vue {
                 // console.log(prop)
             }
         }
+
         const ref: any = this.$refs;
         const element: Element = ref.gmap;
         this.MapObj = await new google.maps.Map(element, options);
+
         await Events(this, this.MapObj, GmapEvents);
+        const button: Element = ref.div;
+        console.log(this.$slots)
+        this.MapObj.controls[12].push(button);
     }
 
-
+    genLoading () {
+        const data = {
+            ref: 'div',
+        };
+        return this.$createElement('div', data,
+            [
+                getSlot(this, 'body'),
+                /*this.$scopedSlots.default ?
+                    this.$scopedSlots.default.length ? 'scoped' : 'normal' :
+                    this.$slots.default ? 'normal' : 'empty',
+                ' slot'*/
+            ]);
+    }
     public render(h: CreateElement): VNode {
         // this.load();
         const data = {
@@ -533,6 +551,8 @@ export default class GMap extends Vue {
             data,
             [
                 getSlot(this, 'map', {map: this.MapObj}),
+                this.genLoading(),
+
                 /*this.$scopedSlots.default ?
                     this.$scopedSlots.default.length ? 'scoped' : 'normal' :
                     this.$slots.default ? 'normal' : 'empty',

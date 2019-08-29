@@ -1,14 +1,19 @@
-<template>
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
     <v-sheet>
 
     <GMap :center="center"
-          zoom-control
-          street-view-control
           map-type-control
           fullscreen-control
+          street-view-control
+          zoom-control
           :style="[0]"
-          style="height: 300px; width: 300px"
+          style="height: 500px; width: 500px"
     >
+        <template v-slot:body>
+           <v-btn class="mt-5">
+               amir
+           </v-btn>
+        </template>
     </GMap>
     </v-sheet>
 </template>

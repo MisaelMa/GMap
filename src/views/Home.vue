@@ -11,14 +11,13 @@
         <v-btn @click="zoom--">
             <v-icon>zoom_out</v-icon>
         </v-btn>
-        -
         <GAutocomplete id="a"></GAutocomplete>
         <v-select
                 v-model="MapTypeIda"
                 :items="MapsTypeIds"
                 label="Standard"
         ></v-select>
-        <GMap
+       <!-- <GMap
                 :center="center"
                 :heading="100"
                 :zoom="zoom"
@@ -40,21 +39,18 @@
                 style="height: 500px"
 
         >
-            <template v-slot:map="{map}">
-                <GInfoWindow :map="map"></GInfoWindow>
-            </template>
 
-        </GMap>
+
+        </GMap>-->
     </div>
 </template>
-
 <script lang="ts">
     import {Component, Vue} from "vue-property-decorator";
     import {LatLngLiteral} from "@/interfaces/GoogleMaps";
     import ApiDoc from "@/components/Core/Docs/ApiDoc.vue";
     import GAutocomplete from "@/components/GAutocomplete";
     import {GClusterer} from "@/components/GClusterer";
-    import MapTypeId = google.maps.MapTypeId;
+     /// import {VAutocomplete} from '@/components/GAutocomplete/vuetify/components/VAutocomplete';
 
     @Component({
         components: {
@@ -194,7 +190,8 @@
             },
         ];
 
-
+        public mounted(){
+        }
         public clickFuntion(data: any) {
             console.log(data)
             /*let obj = {
